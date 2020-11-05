@@ -224,6 +224,13 @@ $('#count').on('keyup blur', function (e) {
     } else {
         $(this).val(parseInt($(this).val()))
     }
+  
+    if ($(this).val() < 0) {
+        $(this).val('1');
+    } else {
+        $(this).val(parseInt($(this).val()))
+    }
+
 });
 
 $(document).ready(function () {
