@@ -995,3 +995,29 @@ function UnlockInventory() {
     $('#inventoryOne').removeClass('disabled');
     $('#inventoryTwo').removeClass('disabled');
 }
+
+
+// FAST USE BY GRZ
+
+$('#inventoryOne, #inventoryTwo').click(function(e, event, ui) {
+        if(e.shiftKey) {
+            if (dragging) {
+                itemData = $(draggingItem).find('.item').data("item");
+                if (itemData.usable) {
+                    InventoryLog('Using ' + itemData.label + ' and Close ' + itemData.closeUi);
+                    $.post("http://disc-inventoryhud/UseItem", JSON.stringify({
+                        owner: $(draggingItem).parent().data('invOwner'),
+                        slot: $(draggingItem).data('slot'),
+                        item: itemData
+                    }));
+                    if (itemData.closeUi) {
+                        closeInventory();
+                    }
+                    successAudio.play();
+                    EndDragging();
+                } else {
+                    failAudio.play();
+                }
+            }
+        }
+    });
