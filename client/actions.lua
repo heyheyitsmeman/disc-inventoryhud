@@ -45,16 +45,18 @@ function UseItem(slot)
     if isHotKeyCoolDown then
         return
     end
+
     Citizen.CreateThread(function()
         isHotKeyCoolDown = true
         Citizen.Wait(Config.HotKeyCooldown)
         isHotKeyCoolDown = false
     end)
+
     ESX.TriggerServerCallback('disc-inventoryhud:UseItemFromSlot', function(item)
         if item then
-            if isWeapon(item.id) then
+            if not isWeapon(item.id) then
                 currentWeaponSlot = slot
-            end
+          
             TriggerServerEvent('disc-inventoryhud:notifyImpendingRemoval', item, 1)
             TriggerServerEvent("esx:useItem", item.id)
             item.msg = _U('used')
@@ -62,9 +64,36 @@ function UseItem(slot)
             TriggerEvent('disc-inventoryhud:showItemUse', {
                 item,
             })
+
+        else
+            if isWeapon(item.id) then
+                currentWeaponSlot = slot
+
+            local curWeapon = GetSelectedPedWeapon(PlayerPedId())
+
+            if curWeapon == GetHashKey('WEAPON_UNARMED') then
+                TriggerServerEvent('disc-inventoryhud:notifyImpendingRemoval', item, 1)
+                TriggerServerEvent("esx:useItem", item.id)
+                item.msg = _U('weapon_draw')
+                item.qty = 1
+
+                TriggerEvent('disc-inventoryhud:showItemUse', {
+                    item,
+                })
+        else
+            TriggerServerEvent('disc-inventoryhud:notifyImpendingRemoval', item, 1)
+            TriggerServerEvent("esx:useItem", item.id)
+            item.msg = _U('holster')
+            item.qty = 1
+
+            TriggerEvent('disc-inventoryhud:showItemUse', {
+                item,
+            })
+        end
+            end
         end
     end
-    , slot)
+end, slot)
 end
 
 RegisterNetEvent('disc-inventoryhud:showItemUse')
